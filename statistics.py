@@ -12,7 +12,7 @@ def calc_avg_time(num_of_tests, num_threads, file_path):
         avg_thread_count_time = [sum(x) for x in zip(avg_thread_count_time, df_temp["Time"].to_list())]
 
     avg_thread_count_time = [x/num_of_tests for x in avg_thread_count_time]
-    return avg_thread_count_time, threads
+    return avg_thread_count_time, threads[:num_threads]
 
 
 

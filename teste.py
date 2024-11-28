@@ -6,8 +6,8 @@ import statistics
 
 # df = pd.read_csv("resultados.txt")
 
-num_tests = 1
-num_threads = 8
+num_tests = 2
+num_threads = 7
 
 avg_time, threads = statistics.calc_avg_time(num_tests, num_threads, "D:/Codes/PCD/TrabalhoFinal/parte1/results.txt")
 
