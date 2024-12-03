@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
-#define N 500  // Tamanho da grade
+#define N 5000  // Tamanho da grade
 #define T 500 // Número de iterações no tempo
 #define D 0.1  // Coeficiente de difusão
-#define NUM_TESTS 10
+#define NUM_TESTS 3
 #define DELTA_T 0.01
 #define DELTA_X 1.0
 
@@ -75,7 +75,7 @@ int main() {
 
 
     
-    file = fopen("results.txt", "w");
+    file = fopen("results_new.txt", "w");
 
     // Executar as iterações no tempo para a equação de difusão
     fprintf(file, "NumThreads,Time,difmedio\n");
@@ -98,21 +98,39 @@ int main() {
 
         // Inicializar uma concentração alta no centro
         C[N / 2][N / 2] = 2.5;
+        printf("Thread 1:\n");
         start_time = omp_get_wtime();
-        diff_eq(C, C_new, 6);
+        diff_eq(C, C_new, 1);
         end_time = omp_get_wtime();
 
         execution_time = (end_time-start_time);
-        // printf("%lf", execution_time);
+        printf("%lf\n", execution_time);
 
         fprintf(file, "%d,%lf,%lf\n",1, execution_time, C[N/2][N/2]);
         for (int num_thread = 2; num_thread <= 12; num_thread+=2){
         
+        	for (int i = 0; i < N; i++) {
+		      for (int j = 0; j < N; j++) {
+		        C[i][j] = 0.;
+		      }
+		    }
+        
+		    for (int i = 0; i < N; i++){
+		    
+		        for (int j = 0; j < N; j++){
+		        
+		            C_new[i][j] = 0.;
+		        }
+		    }
+		    C[N / 2][N / 2] = 2.5;
+        	
+        	printf("Thread %d:\n", num_thread);
             start_time = omp_get_wtime();
             diff_eq(C, C_new, num_thread);
             end_time = omp_get_wtime();
 
             execution_time = (end_time-start_time);
+            printf("%lf\n", execution_time);
 
             fprintf(file, "%d,%lf,%lf\n",num_thread, execution_time, C[N/2][N/2]);
         }
@@ -120,7 +138,7 @@ int main() {
     
     fclose(file);
     // Exibir resultado para verificação
-    printf("%lf\n", C[(N/2)-1][(N/2)+1]);
-    printf("Concentração final no centro: %f\n", C[N/2][N/2]);
+    //printf("%lf\n", C[(N/2)-1][(N/2)+1]);
+    //printf("Concentração final no centro: %f\n", C[N/2][N/2]);
     return 0;
 }
