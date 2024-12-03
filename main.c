@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
-#define N 10000  // Tamanho da grade
+#define N 500  // Tamanho da grade
 #define T 500 // Número de iterações no tempo
 #define D 0.1  // Coeficiente de difusão
+#define NUM_TESTS 10
 #define DELTA_T 0.01
 #define DELTA_X 1.0
 
@@ -47,6 +48,7 @@ int main() {
       fprintf(stderr, "Memory allocation failed\n");
       return 1;
     }
+    
     for (int i = 0; i < N; i++) {
       C[i] = (double *)malloc(N * sizeof(double));
       if (C[i] == NULL) {
@@ -54,34 +56,37 @@ int main() {
         return 1;
       }
     }
+    double **C_new = (double **)malloc(N * sizeof(double *));
+
+    // Concentração para a próxima iteração
+    if (C_new == NULL) {
+      fprintf(stderr, "Memory allocation failed\n");
+      return 1;
+    }
+    for (int i = 0; i < N; i++){
+    
+        C_new[i] = (double *)malloc(N * sizeof(double));
+        if (C_new[i] == NULL){
+        
+            fprintf(stderr, "Memory allocation failed\n");
+            return 1;
+        }
+    }
+
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
         C[i][j] = 0.;
       }
     }
 
-    // Concentração para a próxima iteração
-    double **C_new = (double **)malloc(N * sizeof(double *));
-    if (C_new == NULL) {
-      fprintf(stderr, "Memory allocation failed\n");
-      return 1;
-    }
     
-    file = fopen("results.txt", "a");
+    file = fopen("results.txt", "w");
 
     // Executar as iterações no tempo para a equação de difusão
     fprintf(file, "NumThreads,Time,difmedio\n");
-    for (int num_test = 0; num_test < 5; num_test++){
+    for (int num_test = 0; num_test < NUM_TESTS; num_test++){
+        printf("iniciando teste: %d\n", num_test+1);
     
-        for (int i = 0; i < N; i++){
-        
-            C_new[i] = (double *)malloc(N * sizeof(double));
-            if (C_new[i] == NULL){
-            
-                fprintf(stderr, "Memory allocation failed\n");
-                return 1;
-            }
-        }
         for (int i = 0; i < N; i++){
         
             for (int j = 0; j < N; j++){
@@ -93,12 +98,13 @@ int main() {
         // Inicializar uma concentração alta no centro
         C[N / 2][N / 2] = 2.5;
         start_time = omp_get_wtime();
-        diff_eq(C, C_new, 1);
+        diff_eq(C, C_new, 6);
         end_time = omp_get_wtime();
 
         execution_time = (end_time-start_time);
+        // printf("%lf", execution_time);
 
-        
+        fprintf(file, "%d,%lf,%lf\n",1, execution_time, C[N/2][N/2]);
         for (int num_thread = 2; num_thread <= 12; num_thread+=2){
         
             start_time = omp_get_wtime();
@@ -113,6 +119,7 @@ int main() {
     
     fclose(file);
     // Exibir resultado para verificação
+    printf("%lf\n", C[(N/2)-1][(N/2)+1]);
     printf("Concentração final no centro: %f\n", C[N/2][N/2]);
     return 0;
 }
