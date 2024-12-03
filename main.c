@@ -73,11 +73,6 @@ int main() {
         }
     }
 
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        C[i][j] = 0.;
-      }
-    }
 
     
     file = fopen("results.txt", "w");
@@ -87,6 +82,12 @@ int main() {
     for (int num_test = 0; num_test < NUM_TESTS; num_test++){
         printf("iniciando teste: %d\n", num_test+1);
     
+        for (int i = 0; i < N; i++) {
+          for (int j = 0; j < N; j++) {
+            C[i][j] = 0.;
+          }
+        }
+        
         for (int i = 0; i < N; i++){
         
             for (int j = 0; j < N; j++){
